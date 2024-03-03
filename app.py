@@ -1,25 +1,20 @@
 import pandas as pd
 import streamlit as st
+import plotly.express as px
 
 st.title("Stock Data Visualization 2")
 df = pd.read_excel(r"data/CIT_NN.xlsx", sheet_name='files')
 
 df['datetime'] = pd.to_datetime(df['datetime'])
 
-# Get the minimum and maximum dates from your DataFrame
-min_date = df['datetime'].min()
-max_date = df['datetime'].max()
 
-# Use two date_input widgets for start and end dates
-start_date = st.date_input('Start date', min_date)
-end_date = st.date_input('End date', max_date)
 
-# Ensure end_date is after start_date
-if start_date > end_date:
-    st.error('Error: End date must fall after start date.')
+# Allow user to select a ticker
+ticker = st.selectbox('Select a stock ticker:', df['stocks'].unique())
 
-# Filter the DataFrame based on the selected date range
-filtered_df = df[(df['datetime'] >= pd.to_datetime(start_date)) & (df['datetime'] <= pd.to_datetime(end_date))]
+# Filter the DataFrame for the selected ticker
+ticker_data = df[df['stocks'] == ticker]
 
-# Display the filtered DataFrame
-st.dataframe(filtered_df)
+# Plot and display the data for the selected ticker
+fig = px.line(ticker_data, x='datetime', y='close', title=f'Closing Price of {ticker} Over Time')
+st.plotly_chart(fig)
