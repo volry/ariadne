@@ -22,9 +22,11 @@ st.title('Stock Data Visualization')
 # Filter the DataFrame for the selected ticker
 ticker_data = df[df['stocks'] == ticker]
 
-# Create the subplots for OHLC and Volume
-fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.1,
-                    subplot_titles=('OHLC', 'Volume'))
+
+fig = make_subplots(rows=3, cols=1, shared_xaxes=True,
+                    vertical_spacing=0.02,  # You may need to adjust this to achieve the desired spacing
+                    subplot_titles=('OHLC', 'Volume', 'Indicators'),
+                    row_heights=[0.7, 0.2, 0.1])  # Adjusted heights: more space for OHLC, less for indicators
 
 # OHLC chart
 fig.add_trace(go.Candlestick(x=ticker_data['datetime'],
@@ -41,9 +43,14 @@ fig.add_trace(go.Bar(x=ticker_data['datetime'],
                      marker_color='blue'), row=2, col=1)
 
 # Customize layout for OHLC and Volume
-fig.update_layout(title='OHLC and Volume', xaxis_title='Date', xaxis_rangeslider_visible=False)
-# Display the figure in Streamlit, using the full width of the container for OHLC and Volume
-st.plotly_chart(fig, use_container_width=True)
+# Customize layout
+fig.update_layout(
+    height=1200,  # Increased height for the entire figure
+    title='Stock Data Visualization',
+    xaxis_title='Date',
+    xaxis_rangeslider_visible=False
+)
+
 
 # Indicator checkboxes and chart
 st.header('Indicators')
