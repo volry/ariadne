@@ -122,6 +122,20 @@ if ss.logged_in:
 
         # Customize layout for the indicator chart
         indicator_fig.update_layout(height=300, title='Indicators', xaxis_title='Date')
+        # Customize layout for the indicator chart
+        indicator_fig.update_layout(
+
+            height=300,
+            title='Indicators',
+            xaxis_title='Date',
+            legend=dict(
+                yanchor="top",
+                y=-0.3,  # Negative y value to place the legend below the chart
+                xanchor="center",
+                x=0.5
+                )
+            )   
+
 
         # Display the indicator figure
         st.plotly_chart(indicator_fig, use_container_width=True)
