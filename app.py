@@ -5,7 +5,7 @@ from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.1", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.2", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 def check_credentials(username, password):
