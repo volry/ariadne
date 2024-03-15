@@ -6,7 +6,7 @@ from streamlit import session_state as ss
 
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.3", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.4", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 def check_credentials(username, password):
@@ -24,27 +24,24 @@ login_placeholder = st.empty()
 with st.sidebar:
     if not ss.logged_in:
         st.title("Login")
-        username = st.text_input("Username", key='username')  # Assign a key to the input widget
-        password = st.text_input("Password", type="password", key='password')  # Assign a key to the input widget
+        ss.username = st.text_input("Username", key='username')  # Make sure to set the session state
+        ss.password = st.text_input("Password", type="password", key='password')  # Make sure to set the session state
         if st.button("Login"):
-            if check_credentials(username, password):
+            if check_credentials(ss.username, ss.password):
                 ss.logged_in = True
-                # Use the placeholder to clear the login form
-                login_placeholder.empty()
+                login_placeholder.empty()  # This clears the login form
                 st.success("Logged in successfully.")
             else:
                 st.error("Incorrect username or password. Please try again.")
-    elif ss.logged_in:
-        st.title("Logout")
+    else:
+        # If the logout button is pressed
         if st.button("Logout"):
             ss.logged_in = False
-            # Clear the session state that holds the form data
-            del ss.username
-            del ss.password
-            # Clear the login form using the placeholder
-            login_placeholder.empty()
-            # After logging out, we can choose to stop the app to clear all widgets
-            st.experimental_rerun()
+            ss.pop('username', None)  # Safely remove 'username' from session state
+            ss.pop('password', None)  # Safely remove 'password' from session state
+            login_placeholder.empty()  # Clear the placeholder
+            st.experimental_rerun()  # Rerun the app which clears all widgets
+
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
