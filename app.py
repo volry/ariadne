@@ -6,7 +6,7 @@ from streamlit import session_state as ss
 
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.1", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.3", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 def check_credentials(username, password):
@@ -20,36 +20,31 @@ if 'logged_in' not in ss:
 login_placeholder = st.empty()
 
 # Sidebar for login/logout
-with login_placeholder.container():
+# Sidebar for login/logout
+with st.sidebar:
     if not ss.logged_in:
         st.title("Login")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
+        username = st.text_input("Username", key='username')  # Assign a key to the input widget
+        password = st.text_input("Password", type="password", key='password')  # Assign a key to the input widget
         if st.button("Login"):
             if check_credentials(username, password):
                 ss.logged_in = True
-                login_placeholder.empty()  # This clears the login form
+                # Use the placeholder to clear the login form
+                login_placeholder.empty()
                 st.success("Logged in successfully.")
             else:
                 st.error("Incorrect username or password. Please try again.")
-    else:
+    elif ss.logged_in:
+        st.title("Logout")
         if st.button("Logout"):
             ss.logged_in = False
-            # Optionally, you can clear the entire session state:
-            # for key in ss.keys():
-            #     del ss[key]
-            # You can redirect to the login form or show it again here
+            # Clear the session state that holds the form data
+            del ss.username
+            del ss.password
+            # Clear the login form using the placeholder
             login_placeholder.empty()
-            st.title("Login")
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            if st.button("Login"):
-                if check_credentials(username, password):
-                    ss.logged_in = True
-                    login_placeholder.empty()  # This clears the login form
-                    st.success("Logged in successfully.")
-                else:
-                    st.error("Incorrect username or password. Please try again.")
+            # After logging out, we can choose to stop the app to clear all widgets
+            st.experimental_rerun()
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
