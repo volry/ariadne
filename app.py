@@ -120,8 +120,7 @@ if ss.logged_in:
                                                mode='lines', name='Attention Predicted',
                                                line=dict(color='yellow', width=2)))
 
-        # Customize layout for the indicator chart
-        indicator_fig.update_layout(height=300, title='Indicators', xaxis_title='Date')
+        
         # Customize layout for the indicator chart
         indicator_fig.update_layout(
 
