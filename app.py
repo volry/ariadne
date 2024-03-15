@@ -6,7 +6,7 @@ from streamlit import session_state as ss
 
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.4", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.5", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 def check_credentials(username, password):
@@ -20,13 +20,14 @@ if 'logged_in' not in ss:
 login_placeholder = st.empty()
 
 # Sidebar for login/logout
-# Sidebar for login/logout
 with st.sidebar:
     if not ss.logged_in:
         st.title("Login")
-        ss.username = st.text_input("Username", key='username')  # Make sure to set the session state
-        ss.password = st.text_input("Password", type="password", key='password')  # Make sure to set the session state
+        # Use the returned values from input widgets directly for the session state
+        username = st.text_input("Username", key='username')
+        password = st.text_input("Password", type="password", key='password')
         if st.button("Login"):
+            # Access the values directly from the session state using the keys
             if check_credentials(ss.username, ss.password):
                 ss.logged_in = True
                 login_placeholder.empty()  # This clears the login form
@@ -34,13 +35,15 @@ with st.sidebar:
             else:
                 st.error("Incorrect username or password. Please try again.")
     else:
-        # If the logout button is pressed
         if st.button("Logout"):
             ss.logged_in = False
-            ss.pop('username', None)  # Safely remove 'username' from session state
-            ss.pop('password', None)  # Safely remove 'password' from session state
+            # Use the pop method with a default return value to avoid errors
+            ss.pop('username', None)
+            ss.pop('password', None)
             login_placeholder.empty()  # Clear the placeholder
-            st.experimental_rerun()  # Rerun the app which clears all widgets
+            # Rerun the app to clear all widgets and reset the state
+            st.experimental_rerun()
+
 
 
 # Main app content (only shown if logged in)
