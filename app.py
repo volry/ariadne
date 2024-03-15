@@ -4,8 +4,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 
+
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.2", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.1", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 def check_credentials(username, password):
@@ -15,28 +16,40 @@ def check_credentials(username, password):
 if 'logged_in' not in ss:
     ss.logged_in = False
 
+# Placeholder for the login form
+login_placeholder = st.empty()
+
 # Sidebar for login/logout
-with st.sidebar:
-    st.title("Login")
+with login_placeholder.container():
     if not ss.logged_in:
+        st.title("Login")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.button("Login"):
             if check_credentials(username, password):
                 ss.logged_in = True
-                # Clear the login fields
-                st.session_state['username'] = ''
-                st.session_state['password'] = ''
-                # Display a success message
+                login_placeholder.empty()  # This clears the login form
                 st.success("Logged in successfully.")
             else:
                 st.error("Incorrect username or password. Please try again.")
     else:
-        # Show a logout button and hide the login fields
         if st.button("Logout"):
             ss.logged_in = False
-
-# Main app content (only shown if logged in)
+            # Optionally, you can clear the entire session state:
+            # for key in ss.keys():
+            #     del ss[key]
+            # You can redirect to the login form or show it again here
+            login_placeholder.empty()
+            st.title("Login")
+            username = st.text_input("Username")
+            password = st.text_input("Password", type="password")
+            if st.button("Login"):
+                if check_credentials(username, password):
+                    ss.logged_in = True
+                    login_placeholder.empty()  # This clears the login form
+                    st.success("Logged in successfully.")
+                else:
+                    st.error("Incorrect username or password. Please try again.")
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
