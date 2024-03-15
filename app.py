@@ -17,20 +17,26 @@ if 'logged_in' not in ss:
 
 # Sidebar for login/logout
 with st.sidebar:
+    st.title("Login")
     if not ss.logged_in:
-        st.title("Login")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.button("Login"):
             if check_credentials(username, password):
                 ss.logged_in = True
+                # Clear the login fields
+                st.session_state['username'] = ''
+                st.session_state['password'] = ''
+                # Display a success message
                 st.success("Logged in successfully.")
             else:
                 st.error("Incorrect username or password. Please try again.")
     else:
-        st.title("You're logged in")
+        # Show a logout button and hide the login fields
         if st.button("Logout"):
             ss.logged_in = False
+
+# Main app content (only shown if logged in)
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
