@@ -3,6 +3,36 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from streamlit import session_state as ss
+
+def check_credentials(username, password):
+    # Placeholder for credential checking logic
+    # This should be replaced with a more secure method in production
+    return username == "user" and password == "password"  # Replace with your actual check
+
+# Initialize session state variables if they don't exist
+if 'logged_in' not in ss:
+    ss.logged_in = False
+
+# If not logged in, show the login form
+if not ss.logged_in:
+    with st.sidebar:
+        st.title("Login")
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
+        
+        if st.button("Login"):
+            if check_credentials(username, password):
+                ss.logged_in = True
+                st.success("Logged in successfully.")
+            else:
+                st.error("Incorrect username or password. Please try again.")
+
+# If logged in, show the main app
+if ss.logged_in:
+    st.title('Your Data Science Application')
+    # Rest of your Streamlit app code goes here
+
 
 # Set page configuration and layout to wide mode
 st.set_page_config(layout="wide")
