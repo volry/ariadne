@@ -38,9 +38,6 @@ if ss.logged_in:
     # Rest of your Streamlit app code goes here
 
 
-# Set page configuration and layout to wide mode
-st.set_page_config(layout="wide")
-
 # Load your data
 df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
 df['datetime'] = pd.to_datetime(df['datetime'])
