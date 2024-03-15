@@ -1,9 +1,13 @@
+
 #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
 import streamlit as st
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.1", page_icon=":chart_with_upwards_trend:")
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
+
+
 
 def check_credentials(username, password):
     # Placeholder for credential checking logic
