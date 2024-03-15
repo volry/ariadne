@@ -90,6 +90,7 @@ if ss.logged_in:
     # Customizing the layout of the main figure
     main_fig.update_layout(height=600,  # You can adjust the height as needed
                            title='OHLC and Volume', xaxis_title='Date',
+                           hovermode='x',
                            xaxis_rangeslider_visible=False, showlegend=False)
 
     # Display the main figure with OHLC and Volume
@@ -126,7 +127,7 @@ if ss.logged_in:
 
             height=300,
             title='Indicators',
-            xaxis_title='Date',
+            hovermode='x',  # Shows a line along the x-axis at the hover point
             legend=dict(
                 yanchor="top",
                 y=-0.3,  # Negative y value to place the legend below the chart
