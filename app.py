@@ -61,7 +61,11 @@ with st.sidebar:
             # Rerun the app to clear all widgets and reset the state
             st.experimental_rerun()
 
-
+# Checkboxes for toggling indicators, placed before the main chart code
+with st.container():
+    show_enter = st.checkbox('Show Enter Predicted', True)
+    show_exit = st.checkbox('Show Exit Predicted', True)
+    show_attention = st.checkbox('Show Attention Predicted', True)
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
@@ -103,12 +107,7 @@ if ss.logged_in:
     # Display the main figure with OHLC and Volume
     st.plotly_chart(main_fig, use_container_width=True)
 
-    # Indicators section with checkboxes
-    st.header('Indicators')
-    show_enter = st.checkbox('Show Enter Predicted', True)
-    show_exit = st.checkbox('Show Exit Predicted', True)
-    show_attention = st.checkbox('Show Attention Predicted', True)
-
+    
     # Create a separate figure for indicators if any checkbox is selected
     if show_enter or show_exit or show_attention:
         indicator_fig = go.Figure()
@@ -140,7 +139,7 @@ if ss.logged_in:
                 y=-0.3,  # Negative y value to place the legend below the chart
                 xanchor="center",
                 x=0.5
-                )
+            )
             )   
 
 
