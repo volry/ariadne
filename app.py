@@ -21,6 +21,13 @@ def check_credentials(username, password):
     # Check if the username exists and the password matches
     return USER_CREDENTIALS.get(username) == password
 
+# Decorator to cache data loading function
+@st.cache
+def load_data():
+    df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    return df
+
 
 # Initialize session state for login status
 if 'logged_in' not in ss:
@@ -59,7 +66,7 @@ with st.sidebar:
 # Main app content (only shown if logged in)
 if ss.logged_in:
     # Load your data
-    df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
+    df = load_data()  # Call the cached function to load data
     df['datetime'] = pd.to_datetime(df['datetime'])
 
     # Sidebar for stock ticker selection
