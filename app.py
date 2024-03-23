@@ -22,7 +22,7 @@ def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
 # Decorator to cache data loading function
-@st.cache
+@st.cache_data
 def load_data():
     df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
     df['datetime'] = pd.to_datetime(df['datetime'])
