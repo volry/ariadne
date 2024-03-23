@@ -18,32 +18,33 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.cache(allow_output_mutation=True)
+@st.cache_data
 def load_data():
     df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
     df['datetime'] = pd.to_datetime(df['datetime'])
     return df
 
 # Initialize session state for login status
-if 'logged_in' not in ss:
-    ss.logged_in = False
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
 
 # Sidebar for login/logout
 with st.sidebar:
-    if not ss.logged_in:
+    if not st.session_state.logged_in:
         st.title("Login")
-        username = st.text_input("Username", key='username')
-        password = st.text_input("Password", type="password", key='password')
+        username = st.text_input("Username")
+        password = st.text_input("Password", type="password")
         if st.button("Login"):
             if check_credentials(username, password):
-                ss.logged_in = True
+                st.session_state.logged_in = True
                 st.success("Logged in successfully.")
             else:
                 st.error("Incorrect username or password. Please try again.")
     else:
         if st.button("Logout"):
-            ss.logged_in = False
-            ss.clear()
+            for key in st.session_state.keys():
+                del st.session_state[key]
+            st.experimental_rerun()
 
 # Display login message if not logged in
 if not ss.logged_in:
@@ -52,6 +53,11 @@ if not ss.logged_in:
 # Main app content (only shown if logged in)
 if ss.logged_in:
     df = load_data()
+    st.header('Indicators')
+    # Place indicator checkboxes below the main chart
+    show_enter = st.checkbox('Show Enter Predicted', True)
+    show_exit = st.checkbox('Show Exit Predicted', True)
+    show_attention = st.checkbox('Show Attention Predicted', True)
 
     st.sidebar.header('Stock List')
     ticker = st.sidebar.radio('Choose a ticker:', df['stocks'].unique())
@@ -76,11 +82,7 @@ if ss.logged_in:
 
     st.plotly_chart(main_fig, use_container_width=True)
 
-    st.header('Indicators')
-    # Place indicator checkboxes below the main chart
-    show_enter = st.checkbox('Show Enter Predicted', True)
-    show_exit = st.checkbox('Show Exit Predicted', True)
-    show_attention = st.checkbox('Show Attention Predicted', True)
+  
 
     if show_enter or show_exit or show_attention:
         indicator_fig = go.Figure()
