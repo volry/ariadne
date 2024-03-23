@@ -5,7 +5,7 @@ from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.6", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 USER_CREDENTIALS = {
@@ -44,7 +44,7 @@ with st.sidebar:
         if st.button("Logout"):
             for key in st.session_state.keys():
                 del st.session_state[key]
-            st.experimental_rerun()
+            st.rerun()
 
 # Display login message if not logged in
 if not ss.logged_in:
