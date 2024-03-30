@@ -1,8 +1,34 @@
+#%%
+import sys
+print(sys.path)
+#%%
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
+from  google.cloud import storage
+import sys
+print(sys.path)
+
+
+#%%
+
+gcp_credentials = st.secrets["service_account"]
+
+
+def list_blobs(bucket_name):
+    """Lists all the blobs in the bucket."""
+    storage_client = storage.Client.from_service_account_info(st.secrets["service_account"])
+    blobs = storage_client.list_blobs(bucket_name)
+
+    for blob in blobs:
+        print(blob.name)
+
+# Replace with your bucket name
+bucket_name = 'ariadne_bucket'
+list_blobs(bucket_name)
+
 
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
