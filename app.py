@@ -1,6 +1,8 @@
 #%%
 import sys
-print(sys.path)
+import streamlit as st
+
+st.write(sys.executable)
 #%%
 import streamlit as st
 import pandas as pd
@@ -8,15 +10,26 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
-import sys
-print(sys.path)
+
+
 
 
 #%%
+storage_client = storage.Client()
+
+def read_file_from_gcs(bucket_name, file_name):
+    bucket = storage_client.get_bucket(bucket_name)
+    blob = bucket.blob(file_name)
+    return blob.download_as_bytes()  # Use download_as_string() if you expect a text file
+
+# Example usage
+bucket_name = 'assets-monitoring-1'
+file_name = 'file-name-in-the-bucket'
+file_contents = read_file_from_gcs(bucket_name, file_name)
+print(file_contents)
 
 
-
-
+#%%
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
 
