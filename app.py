@@ -14,20 +14,7 @@ print(sys.path)
 
 #%%
 
-gcp_credentials = st.secrets["service_account"]
 
-
-def list_blobs(bucket_name):
-    """Lists all the blobs in the bucket."""
-    storage_client = storage.Client.from_service_account_info(st.secrets["service_account"])
-    blobs = storage_client.list_blobs(bucket_name)
-
-    for blob in blobs:
-        print(blob.name)
-
-# Replace with your bucket name
-bucket_name = 'ariadne_bucket'
-list_blobs(bucket_name)
 
 
 # Set page configuration
