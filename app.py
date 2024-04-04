@@ -1,8 +1,4 @@
 #%%
-import sys
-import streamlit as st
-
-st.write(sys.executable)
 #%%
 import streamlit as st
 import pandas as pd
@@ -11,7 +7,8 @@ from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
 
-
+# Set page configuration
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
 
 
 #%%
@@ -22,16 +19,15 @@ def read_file_from_gcs(bucket_name, file_name):
     blob = bucket.blob(file_name)
     return blob.download_as_bytes()  # Use download_as_string() if you expect a text file
 
-# Example usage
-bucket_name = 'assets-monitoring-1'
-file_name = 'file-name-in-the-bucket'
+# # Example usage
+bucket_name = 'assets-monitoring-1/monitoring_runtime_test'
+file_name = 'AFYA.csv'
 file_contents = read_file_from_gcs(bucket_name, file_name)
 print(file_contents)
 
 
 #%%
-# Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
+
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 USER_CREDENTIALS = {
