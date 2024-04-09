@@ -6,28 +6,52 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
+from io import StringIO
 
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
 
 
 #%%
-storage_client = storage.Client()
 
-def read_file_from_gcs(bucket_name, file_name):
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(file_name)
-    return blob.download_as_bytes()  # Use download_as_string() if you expect a text file
+# Create a storage client
+storage_client = storage.Client.from_service_account_json('/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json')
+bucket_name = 'assets-monitoring-1'
+folder_prefix = 'monitoring_runtime_test/'
 
-# # Example usage
-bucket_name = 'assets-monitoring-1/monitoring_runtime_test'
-file_name = 'AFYA.csv'
-file_contents = read_file_from_gcs(bucket_name, file_name)
-print(file_contents)
+# Access the bucket
+bucket = storage_client.bucket(bucket_name)
+
+# List all blobs that start with the folder prefix
+blobs = list(bucket.list_blobs(prefix=folder_prefix))
+
+# Initialize an empty list to hold all DataFrames
+df_list = []
+
+# Iterate over the blobs (files) and load them as DataFrames
+for blob in blobs:
+    # Make sure to process files (blobs ending with '.csv')
+    if blob.name.endswith('.csv'):
+        # Download the contents of the blob as a string
+        data = blob.download_as_text()
+        
+        # Convert string to StringIO object and load into DataFrame
+        df = pd.read_csv(StringIO(data))
+        
+        # Add a column with the name of the file
+        file_name = blob.name.split('/')[-1].replace('.csv', '')
+        df['filename'] = file_name
+        
+        # Append the DataFrame to the list
+        df_list.append(df)
+
+# Concatenate all the DataFrames in the list into one
+combined_df = pd.concat(df_list, ignore_index=True)
 
 
 #%%
-
+combined_df.head()
+#%%
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 USER_CREDENTIALS = {
