@@ -7,15 +7,23 @@ from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
 from io import StringIO
-
+from google.oauth2 import service_account
+import google.auth
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.0.8", page_icon=":chart_with_upwards_trend:")
+
+# Use credentials from st.secrets if GOOGLE_APPLICATION_CREDENTIALS not set
+credentials_info = st.secrets["gcp_service_account"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+
+# Use the credentials to create a storage client
+storage_client = storage.Client(credentials=credentials)
 
 
 #%%
 
 # Create a storage client
-storage_client = storage.Client.from_service_account_json('/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json')
+
 bucket_name = 'assets-monitoring-1'
 folder_prefix = 'monitoring_runtime_test/'
 
