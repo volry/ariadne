@@ -22,7 +22,7 @@ google-crc32c==1.5.0
 google-resumable-media==2.7.0
 googleapis-common-protos==1.63.0
 idna==3.6
-ipykernel==6.2.4
+ipykernel>=5.0.0, <6.0.0
 ipython>=7.0,<8.0
 jedi==0.19.1
 Jinja2==3.1.3
