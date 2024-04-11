@@ -9,7 +9,7 @@ from  google.cloud import storage
 from io import StringIO
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.8", page_icon=":chart_with_upwards_trend:")
 
 
 #%%
