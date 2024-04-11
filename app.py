@@ -22,35 +22,11 @@ folder_prefix = 'monitoring_runtime_test/'
 # Access the bucket
 bucket = storage_client.bucket(bucket_name)
 
-# List all blobs that start with the folder prefix
-blobs = list(bucket.list_blobs(prefix=folder_prefix))
 
-# Initialize an empty list to hold all DataFrames
-df_list = []
-
-# Iterate over the blobs (files) and load them as DataFrames
-for blob in blobs:
-    # Make sure to process files (blobs ending with '.csv')
-    if blob.name.endswith('.csv'):
-        # Download the contents of the blob as a string
-        data = blob.download_as_text()
-        
-        # Convert string to StringIO object and load into DataFrame
-        df = pd.read_csv(StringIO(data))
-        
-        # Add a column with the name of the file
-        file_name = blob.name.split('/')[-1].replace('.csv', '')
-        df['filename'] = file_name
-        
-        # Append the DataFrame to the list
-        df_list.append(df)
-
-# Concatenate all the DataFrames in the list into one
-combined_df = pd.concat(df_list, ignore_index=True)
 
 
 #%%
-combined_df.head()
+#combined_df.head()
 #%%
 
 # Function to check user credentials (simple placeholder, not secure for production use)
@@ -66,9 +42,34 @@ def check_credentials(username, password):
 
 @st.cache_data
 def load_data():
-    df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
-    df['datetime'] = pd.to_datetime(df['datetime'])
-    return df
+    #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
+    # List all blobs that start with the folder prefix
+    blobs = list(bucket.list_blobs(prefix=folder_prefix))
+
+# Initialize an empty list to hold all DataFrames
+    df_list = []
+
+    # Iterate over the blobs (files) and load them as DataFrames
+    for blob in blobs:
+        # Make sure to process files (blobs ending with '.csv')
+        if blob.name.endswith('.csv'):
+            # Download the contents of the blob as a string
+            data = blob.download_as_text()
+            
+            # Convert string to StringIO object and load into DataFrame
+            df = pd.read_csv(StringIO(data))
+            
+            # Add a column with the name of the file
+            file_name = blob.name.split('/')[-1].replace('.csv', '')
+            df['stocks'] = file_name
+            
+            # Append the DataFrame to the list
+            df_list.append(df)
+
+#    Concatenate all the DataFrames in the list into one
+    combined_df = pd.concat(df_list, ignore_index=True)
+    combined_df['datetime'] = pd.to_datetime(combined_df['datetime'])
+    return combined_df
 
 # Initialize session state for login status
 if 'logged_in' not in st.session_state:
