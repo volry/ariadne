@@ -6,28 +6,36 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
-
+from io import StringIO
+from google.oauth2 import service_account
+import google.auth
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.7", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.8", page_icon=":chart_with_upwards_trend:")
 
+# Use credentials from st.secrets if GOOGLE_APPLICATION_CREDENTIALS not set
+credentials_info = st.secrets["gcp_service_account"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
 
-#%%
-storage_client = storage.Client()
-
-def read_file_from_gcs(bucket_name, file_name):
-    bucket = storage_client.get_bucket(bucket_name)
-    blob = bucket.blob(file_name)
-    return blob.download_as_bytes()  # Use download_as_string() if you expect a text file
-
-# # Example usage
-bucket_name = 'assets-monitoring-1/monitoring_runtime_test'
-file_name = 'AFYA.csv'
-file_contents = read_file_from_gcs(bucket_name, file_name)
-print(file_contents)
+# Use the credentials to create a storage client
+storage_client = storage.Client(credentials=credentials)
 
 
 #%%
 
+# Create a storage client
+
+bucket_name = 'assets-monitoring-1'
+folder_prefix = 'monitoring_runtime_test/'
+
+# Access the bucket
+bucket = storage_client.bucket(bucket_name)
+
+
+
+
+#%%
+#combined_df.head()
+#%%
 
 # Function to check user credentials (simple placeholder, not secure for production use)
 USER_CREDENTIALS = {
@@ -42,9 +50,34 @@ def check_credentials(username, password):
 
 @st.cache_data
 def load_data():
-    df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
-    df['datetime'] = pd.to_datetime(df['datetime'])
-    return df
+    #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
+    # List all blobs that start with the folder prefix
+    blobs = list(bucket.list_blobs(prefix=folder_prefix))
+
+# Initialize an empty list to hold all DataFrames
+    df_list = []
+
+    # Iterate over the blobs (files) and load them as DataFrames
+    for blob in blobs:
+        # Make sure to process files (blobs ending with '.csv')
+        if blob.name.endswith('.csv'):
+            # Download the contents of the blob as a string
+            data = blob.download_as_text()
+            
+            # Convert string to StringIO object and load into DataFrame
+            df = pd.read_csv(StringIO(data))
+            
+            # Add a column with the name of the file
+            file_name = blob.name.split('/')[-1].replace('.csv', '')
+            df['stocks'] = file_name
+            
+            # Append the DataFrame to the list
+            df_list.append(df)
+
+#    Concatenate all the DataFrames in the list into one
+    combined_df = pd.concat(df_list, ignore_index=True)
+    combined_df['datetime'] = pd.to_datetime(combined_df['datetime'])
+    return combined_df
 
 # Initialize session state for login status
 if 'logged_in' not in st.session_state:
