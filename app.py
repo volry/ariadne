@@ -10,7 +10,7 @@ from io import StringIO
 from google.oauth2 import service_account
 import google.auth
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.8", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.0.9", page_icon=":chart_with_upwards_trend:")
 
 # Use credentials from st.secrets if GOOGLE_APPLICATION_CREDENTIALS not set
 credentials_info = st.secrets["gcp_service_account"]
@@ -25,7 +25,7 @@ storage_client = storage.Client(credentials=credentials)
 # Create a storage client
 
 bucket_name = 'assets-monitoring-1'
-folder_prefix = 'monitoring_runtime_test/'
+folder_prefix = 'monitoring_runtime/'
 
 # Access the bucket
 bucket = storage_client.bucket(bucket_name)
