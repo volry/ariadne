@@ -1,14 +1,17 @@
 #%%
 #%%
 import streamlit as st
+import base64
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from streamlit import session_state as ss
 from  google.cloud import storage
 from io import StringIO
+from io import BytesIO
 from google.oauth2 import service_account
 import google.auth
+
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.1.0", page_icon=":chart_with_upwards_trend:")
 
@@ -21,6 +24,19 @@ storage_client = storage.Client(credentials=credentials)
 
 
 #%%
+# Function to convert dataframe to CSV and then encode it
+def to_csv(df):
+    output = BytesIO()
+    df.to_csv(output, index=False)
+    return output.getvalue()
+
+# Function to generate a download link
+def get_download_link(df, filename='data.csv', text='Download CSV file'):
+    csv = to_csv(df)
+    b64 = base64.b64encode(csv).decode()
+    href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">{text}</a>'
+    return href
+
 
 # Create a storage client
 
@@ -92,7 +108,7 @@ with st.sidebar:
         st.experimental_rerun()
 
 # Load the data
-df = load_data_from_gcs(bucket_name, folder_prefix)
+#df = load_data_from_gcs(bucket_name, folder_prefix)
 # Sidebar for login/logout
 with st.sidebar:
     if not st.session_state.logged_in:
@@ -171,3 +187,11 @@ if ss.logged_in:
                                     legend=dict(yanchor="top", y=-0.3, xanchor="center", x=0.5))
 
         st.plotly_chart(indicator_fig, use_container_width=True)
+
+    # Button to download CSV
+    st.sidebar.download_button(
+        label="Download data as CSV",
+        data=to_csv(df),
+        file_name='combined_data.csv',
+        mime='text/csv',
+    )
