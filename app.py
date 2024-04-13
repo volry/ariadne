@@ -10,7 +10,7 @@ from io import StringIO
 from google.oauth2 import service_account
 import google.auth
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.0.9", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.1.0", page_icon=":chart_with_upwards_trend:")
 
 # Use credentials from st.secrets if GOOGLE_APPLICATION_CREDENTIALS not set
 credentials_info = st.secrets["gcp_service_account"]
@@ -83,7 +83,7 @@ if 'logged_in' not in st.session_state:
 
 # Sidebar for login/logout
 with st.sidebar:
-    
+
     st.title("Data Refresh")
     if st.button('Refresh Data'):
         # This will clear the cache and reload the data
