@@ -48,7 +48,7 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_data():
     #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
     # List all blobs that start with the folder prefix
