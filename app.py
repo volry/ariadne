@@ -47,10 +47,8 @@ folder_prefix = 'monitoring_runtime/'
 bucket = storage_client.bucket(bucket_name)
 
 
-
-
 #%%
-#combined_df.head()
+
 #%%
 
 # Function to check user credentials (simple placeholder, not secure for production use)
@@ -64,13 +62,13 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.experimental_memo(ttl=300)
+@st.experimental_memo(ttl=3600)
 def load_data_from_gcs(bucket_name, folder_prefix):
-    #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
+   
     # List all blobs that start with the folder prefix
     blobs = list(bucket.list_blobs(prefix=folder_prefix))
 
-# Initialize an empty list to hold all DataFrames
+    # Initialize an empty list to hold all DataFrames
     df_list = []
 
     # Iterate over the blobs (files) and load them as DataFrames
@@ -99,33 +97,30 @@ def load_data_from_gcs(bucket_name, folder_prefix):
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
-# Button to manually refresh data
+# Sidebar for login/logout and data refresh
 with st.sidebar:
-    if st.button('Refresh Data'):
-        # This clears the cache for the memoized function
-        load_data_from_gcs.clear()
-        # This re-runs the app, causing the data to be reloaded
-        st.experimental_rerun()
+    if st.session_state.logged_in:
+        st.title("Data Refresh")
+        if st.button('Refresh Data'):
+            # Clear the cache and rerun the app to load fresh data
+            load_data_from_gcs.clear()  # This will clear the memoized function's cache
+            st.experimental_rerun()  # Rerun the app to reflect the changes
 
-# Load the data
-#df = load_data_from_gcs(bucket_name, folder_prefix)
-# Sidebar for login/logout
-with st.sidebar:
-    if not st.session_state.logged_in:
+        st.title("Logout")
+        if st.button("Logout"):
+            st.session_state.logged_in = False
+            st.experimental_rerun()
+    
+    else:
         st.title("Login")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
         if st.button("Login"):
             if check_credentials(username, password):
                 st.session_state.logged_in = True
-                st.success("Logged in successfully.")
+                st.experimental_rerun()
             else:
                 st.error("Incorrect username or password. Please try again.")
-    else:
-        if st.button("Logout"):
-            for key in st.session_state.keys():
-                del st.session_state[key]
-            st.rerun()
 
 # Display login message if not logged in
 if not ss.logged_in:
