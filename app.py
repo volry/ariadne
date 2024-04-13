@@ -48,8 +48,8 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.cache_data(ttl=300)
-def load_data():
+@st.experimental_memo(ttl=300)
+def load_data_from_gcs(bucket_name, folder_prefix):
     #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
     # List all blobs that start with the folder prefix
     blobs = list(bucket.list_blobs(prefix=folder_prefix))
@@ -83,6 +83,16 @@ def load_data():
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 
+# Button to manually refresh data
+with st.sidebar:
+    if st.button('Refresh Data'):
+        # This clears the cache for the memoized function
+        load_data_from_gcs.clear()
+        # This re-runs the app, causing the data to be reloaded
+        st.experimental_rerun()
+
+# Load the data
+df = load_data_from_gcs(bucket_name, folder_prefix)
 # Sidebar for login/logout
 with st.sidebar:
     if not st.session_state.logged_in:
