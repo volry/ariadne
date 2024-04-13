@@ -25,7 +25,7 @@ storage_client = storage.Client(credentials=credentials)
 # Create a storage client
 
 bucket_name = 'assets-monitoring-1'
-folder_prefix = 'monitoring_runtime/'
+folder_prefix = 'monitoring_runtime_test/'
 
 # Access the bucket
 bucket = storage_client.bucket(bucket_name)
