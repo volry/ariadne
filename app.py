@@ -48,13 +48,11 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.cache_data
+#@st.cache_data
 def load_data():
-    #df = pd.read_excel("data/CIT_NN.xlsx", sheet_name='files')
-    # List all blobs that start with the folder prefix
+    
     blobs = list(bucket.list_blobs(prefix=folder_prefix))
 
-# Initialize an empty list to hold all DataFrames
     df_list = []
 
     # Iterate over the blobs (files) and load them as DataFrames
@@ -85,6 +83,13 @@ if 'logged_in' not in st.session_state:
 
 # Sidebar for login/logout
 with st.sidebar:
+    
+    st.title("Data Refresh")
+    if st.button('Refresh Data'):
+        # This will clear the cache and reload the data
+        st.legacy_caching.clear_cache()
+        st.experimental_rerun()
+
     if not st.session_state.logged_in:
         st.title("Login")
         username = st.text_input("Username")
