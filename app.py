@@ -87,7 +87,7 @@ with st.sidebar:
     st.title("Data Refresh")
     if st.button('Refresh Data'):
         # This will clear the cache and reload the data
-        st.legacy_caching.clear_cache()
+        st.caching.clear_cache()
         st.experimental_rerun()
 
     if not st.session_state.logged_in:
