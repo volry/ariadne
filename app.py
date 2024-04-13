@@ -117,7 +117,7 @@ if not ss.logged_in:
 
 # Main app content (only shown if logged in)
 if ss.logged_in:
-    df = load_data()
+    df = load_data_from_gcs()
     st.header('Indicators')
     # Place indicator checkboxes below the main chart
     show_enter = st.checkbox('Show Enter Predicted', True)
