@@ -8,12 +8,14 @@ from io import StringIO
 # Set page configuration
 st.set_page_config(layout="wide", page_title="Ariadne v.0.1.2", page_icon=":chart_with_upwards_trend:")
 
-# Use credentials from st.secrets
-credentials_info = st.secrets["gcp_service_account"]
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
+# local key
+key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+storage_client = storage.Client.from_service_account_json(key_path)
 
-# Use the credentials to create a storage client
-storage_client = storage.Client(credentials=credentials)
+# Use credentials from st.secrets
+# credentials_info = st.secrets["gcp_service_account"]
+# credentials = service_account.Credentials.from_service_account_info(credentials_info)
+# storage_client = storage.Client(credentials=credentials)
 
 @st.experimental_memo(ttl=3600)
 def load_data_from_gcs(bucket_name, folder_prefix):
