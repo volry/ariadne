@@ -62,7 +62,7 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
-@st.experimental_memo(ttl=3600)
+@st.cache_data(ttl=3600)
 def load_data_from_gcs(bucket_name, folder_prefix):
    
     # List all blobs that start with the folder prefix
@@ -176,7 +176,7 @@ if ss.logged_in:
         if show_attention:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Attention_predicted'],
                                                mode='lines', name='Attention Predicted',
-                                               line=dict(color='yellow', width=2)))
+                                               line=dict(color='blue', width=2)))
 
         indicator_fig.update_layout(height=300, title='Indicators', hovermode='x',
                                     legend=dict(yanchor="top", y=-0.3, xanchor="center", x=0.5))
