@@ -188,7 +188,7 @@ if ss.logged_in:
     main_fig.update_layout(height=600, title='OHLC and Volume', xaxis_title='Date',
                            hovermode='x', xaxis_rangeslider_visible=False, showlegend=False)
 
-    st.plotly_chart(main_fig, use_container_width=True)
+    
 
   
 
@@ -198,23 +198,24 @@ if ss.logged_in:
         if show_enter:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Enter_predicted'],
                                                mode='lines', name='Enter Predicted',
-                                               line=dict(color='green', width=2)))
+                                               line=dict(color='green', width=3)))
 
         if show_exit:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Exit_predicted'],
                                                mode='lines', name='Exit Predicted',
-                                               line=dict(color='red', width=2)))
+                                               line=dict(color='red', width=3)))
 
         if show_attention:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Attention_predicted'],
                                                mode='lines', name='Attention Predicted',
-                                               line=dict(color='yellow', width=2)))
+                                               line=dict(color='blue', width=3)))
 
         indicator_fig.update_layout(height=300, title='Indicators', hovermode='x',
                                     legend=dict(yanchor="top", y=-0.3, xanchor="center", x=0.5))
 
         st.plotly_chart(indicator_fig, use_container_width=True)
 
+    st.plotly_chart(main_fig, use_container_width=True)
     # Button to download CSV
     st.sidebar.download_button(
         label="Download data as CSV",
