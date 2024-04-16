@@ -1,5 +1,3 @@
-#%%
-#%%
 import streamlit as st
 import base64
 import pandas as pd
@@ -11,16 +9,49 @@ from io import StringIO
 from io import BytesIO
 from google.oauth2 import service_account
 import google.auth
+import streamlit.components.v1 as components
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.1.2", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.1.3", page_icon=":chart_with_upwards_trend:")
 
-# Use credentials from st.secrets if GOOGLE_APPLICATION_CREDENTIALS not set
+# local key
+# key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+# storage_client = storage.Client.from_service_account_json(key_path)
+
+# Use credentials from st.secrets
 credentials_info = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(credentials_info)
-
-# Use the credentials to create a storage client
 storage_client = storage.Client(credentials=credentials)
+
+# Function to generate HTML for TradingView widget
+def tradingview_widget(ticker):
+    return f'''
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div id="tradingview_{ticker}"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+      <script type="text/javascript">
+      new TradingView.widget(
+      {{
+        "width": "100%",
+        "height": 610,
+        "symbol": "{ticker}",
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": "light",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#f1f3f6",
+        "enable_publishing": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_{ticker}"
+      }}
+      );
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    '''
+
 
 
 #%%
@@ -104,12 +135,12 @@ with st.sidebar:
         if st.button('Refresh Data'):
             # Clear the cache and rerun the app to load fresh data
             load_data_from_gcs.clear()  # This will clear the memoized function's cache
-            st.experimental_rerun()  # Rerun the app to reflect the changes
+            st.rerun()  # Rerun the app to reflect the changes
 
         st.title("Logout")
         if st.button("Logout"):
             st.session_state.logged_in = False
-            st.experimental_rerun()
+            st.rerun()
     
     else:
         st.title("Login")
@@ -118,7 +149,7 @@ with st.sidebar:
         if st.button("Login"):
             if check_credentials(username, password):
                 st.session_state.logged_in = True
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("Incorrect username or password. Please try again.")
 
@@ -129,6 +160,7 @@ if not ss.logged_in:
 # Main app content (only shown if logged in)
 if ss.logged_in:
     df = load_data_from_gcs(bucket_name, folder_prefix)
+
     st.header('Indicators')
     # Place indicator checkboxes below the main chart
     show_enter = st.checkbox('Show Enter Predicted', True)
@@ -139,7 +171,7 @@ if ss.logged_in:
     ticker = st.sidebar.radio('Choose a ticker:', df['stocks'].unique())
 
     st.title('Stock Data Visualization')
-
+    components.html(tradingview_widget(ticker), height=610)
     ticker_data = df[df['stocks'] == ticker]
 
     main_fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
@@ -153,12 +185,17 @@ if ss.logged_in:
     main_fig.add_trace(go.Bar(x=ticker_data['datetime'], y=ticker_data['volume'],
                               name='Volume', marker_color='blue'), row=2, col=1)
 
-    main_fig.update_layout(height=600, title='OHLC and Volume', xaxis_title='Date',
-                           hovermode='x', xaxis_rangeslider_visible=False, showlegend=False)
+    main_fig.update_layout(height=600,
+                            title='OHLC and Volume',
+                            xaxis_title='Date',
+                            hovermode='x',
+                            xaxis_rangeslider_visible=False,
+                            showlegend=False,
+                            xaxis_type='category')
 
-    st.plotly_chart(main_fig, use_container_width=True)
+    
 
-  
+    main_fig.update_xaxes(type='category', row=2, col=1)
 
     if show_enter or show_exit or show_attention:
         indicator_fig = go.Figure()
@@ -166,23 +203,24 @@ if ss.logged_in:
         if show_enter:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Enter_predicted'],
                                                mode='lines', name='Enter Predicted',
-                                               line=dict(color='green', width=2)))
+                                               line=dict(color='green', width=3)))
 
         if show_exit:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Exit_predicted'],
                                                mode='lines', name='Exit Predicted',
-                                               line=dict(color='red', width=2)))
+                                               line=dict(color='red', width=3)))
 
         if show_attention:
             indicator_fig.add_trace(go.Scatter(x=ticker_data['datetime'], y=ticker_data['Attention_predicted'],
                                                mode='lines', name='Attention Predicted',
-                                               line=dict(color='blue', width=2)))
+                                               line=dict(color='blue', width=3)))
 
         indicator_fig.update_layout(height=300, title='Indicators', hovermode='x',
                                     legend=dict(yanchor="top", y=-0.3, xanchor="center", x=0.5))
 
         st.plotly_chart(indicator_fig, use_container_width=True)
 
+    st.plotly_chart(main_fig, use_container_width=True)
     # Button to download CSV
     st.sidebar.download_button(
         label="Download data as CSV",
