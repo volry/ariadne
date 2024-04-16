@@ -12,16 +12,16 @@ import google.auth
 import streamlit.components.v1 as components
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.1.2", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.1.3", page_icon=":chart_with_upwards_trend:")
 
 # local key
-key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
-storage_client = storage.Client.from_service_account_json(key_path)
+# key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+# storage_client = storage.Client.from_service_account_json(key_path)
 
 # Use credentials from st.secrets
-# credentials_info = st.secrets["gcp_service_account"]
-# credentials = service_account.Credentials.from_service_account_info(credentials_info)
-# storage_client = storage.Client(credentials=credentials)
+credentials_info = st.secrets["gcp_service_account"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+storage_client = storage.Client(credentials=credentials)
 
 # Function to generate HTML for TradingView widget
 def tradingview_widget(ticker):
@@ -185,12 +185,17 @@ if ss.logged_in:
     main_fig.add_trace(go.Bar(x=ticker_data['datetime'], y=ticker_data['volume'],
                               name='Volume', marker_color='blue'), row=2, col=1)
 
-    main_fig.update_layout(height=600, title='OHLC and Volume', xaxis_title='Date',
-                           hovermode='x', xaxis_rangeslider_visible=False, showlegend=False)
+    main_fig.update_layout(height=600,
+                            title='OHLC and Volume',
+                            xaxis_title='Date',
+                            hovermode='x',
+                            xaxis_rangeslider_visible=False,
+                            showlegend=False,
+                            xaxis_type='category')
 
     
 
-  
+    main_fig.update_xaxes(type='category', row=2, col=1)
 
     if show_enter or show_exit or show_attention:
         indicator_fig = go.Figure()
