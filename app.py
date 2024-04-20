@@ -93,6 +93,18 @@ USER_CREDENTIALS = {
 def check_credentials(username, password):
     return USER_CREDENTIALS.get(username) == password
 
+
+def filter_recent_signals(df, days):
+    lookback_date = pd.Timestamp.today() - pd.Timedelta(days=days)
+    filtered_df = df.copy()
+    # Filter the DataFrame for recent 'Enter_class' signals
+    filtered_df = df[(df['Enter_class'] == 1) & (df['datetime'] > lookback_date)]
+    # Format 'datetime' to show only the date part
+    filtered_df['datetime'] = filtered_df['datetime'].dt.date
+    # Reset the index without adding an index column in the new DataFrame
+    filtered_df = filtered_df.reset_index(drop=True)
+    return filtered_df
+
 @st.cache_data(ttl=3600)
 def load_data_from_gcs(bucket_name, folder_prefix):
    
@@ -122,8 +134,6 @@ def load_data_from_gcs(bucket_name, folder_prefix):
 #    Concatenate all the DataFrames in the list into one
     combined_df = pd.concat(df_list, ignore_index=True)
     combined_df['datetime'] = pd.to_datetime(combined_df['datetime'])
-    lookback_date = pd.Timestamp.today() - pd.Timedelta(days=days)
-    combined_df['Enter_class_recent'] = (combined_df['Enter_class'] == 1) & (combined_df['datetime'] > lookback_date)
     
     return combined_df
     
@@ -131,6 +141,12 @@ def load_data_from_gcs(bucket_name, folder_prefix):
 # Initialize session state for login status
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
+
+# Check if 'data' is already loaded into session state
+if 'data' not in st.session_state or 'filtered_df' not in st.session_state:
+    # If not, load the data and cache it in the session state
+    st.session_state['data'] = load_data_from_gcs(bucket_name, folder_prefix)
+    st.session_state['filtered_df'] = filter_recent_signals(st.session_state['data'], 10)  # Initializing with a default lookback period of 10 days
 
 # Sidebar for login/logout and data refresh
 with st.sidebar:
@@ -145,9 +161,13 @@ with st.sidebar:
         if st.button("Logout"):
             st.session_state.logged_in = False
             st.rerun()
-    
+
         # Sidebar widget to get the number of days for the filter
         days = st.sidebar.number_input('Enter the number of days to look back for Enter_class signals:', min_value=1, value=10)
+        if st.sidebar.button('OK'):
+            # Update the filtered data based on the new number of days
+            st.session_state['filtered_df'] = filter_recent_signals(st.session_state['data'], days)
+            st.rerun()  # Optionally rerun to refresh the data shown on the page
 
     else:
         st.title("Login")
@@ -174,12 +194,13 @@ if ss.logged_in:
     show_exit = st.checkbox('Show Exit Predicted', True)
     show_attention = st.checkbox('Show Attention Predicted', True)
 
+    
     st.header('Recent Enter Signals')
-    recent_signals = df[df['Enter_class_recent']]
-    if not recent_signals.empty:
-        st.dataframe(recent_signals[['stocks', 'datetime']])
+    if 'filtered_df' in st.session_state and not st.session_state['filtered_df'].empty:
+        st.dataframe(st.session_state['filtered_df'][['stocks', 'datetime']])
     else:
         st.write(f"No recent Enter_class signals found in the last {days} days.")
+    
 
 
     st.sidebar.header('Stock List')
