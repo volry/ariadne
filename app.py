@@ -12,16 +12,16 @@ import google.auth
 import streamlit.components.v1 as components
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.1.3", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.1.4", page_icon=":chart_with_upwards_trend:")
 
 # local key
-key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
-storage_client = storage.Client.from_service_account_json(key_path)
+# key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+# storage_client = storage.Client.from_service_account_json(key_path)
 
 # Use credentials from st.secrets
-# credentials_info = st.secrets["gcp_service_account"]
-# credentials = service_account.Credentials.from_service_account_info(credentials_info)
-# storage_client = storage.Client(credentials=credentials)
+credentials_info = st.secrets["gcp_service_account"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+storage_client = storage.Client(credentials=credentials)
 
 # Function to generate HTML for TradingView widget
 def tradingview_widget(ticker):
