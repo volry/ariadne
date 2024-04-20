@@ -96,9 +96,9 @@ def check_credentials(username, password):
 
 def filter_recent_signals(df, days):
     lookback_date = pd.Timestamp.today() - pd.Timedelta(days=days)
-    filtered_df = df.copy()
+    
     # Filter the DataFrame for recent 'Enter_class' signals
-    filtered_df = df[(df['Enter_class'] == 1) & (df['datetime'] > lookback_date)]
+    filtered_df = df[(df['Enter_class'] == 1) & (df['datetime'] > lookback_date)].copy()
     # Format 'datetime' to show only the date part
     filtered_df['datetime'] = filtered_df['datetime'].dt.date
     # Reset the index without adding an index column in the new DataFrame
