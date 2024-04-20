@@ -15,13 +15,13 @@ import streamlit.components.v1 as components
 st.set_page_config(layout="wide", page_title="Ariadne v.0.1.3", page_icon=":chart_with_upwards_trend:")
 
 # local key
-# key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
-# storage_client = storage.Client.from_service_account_json(key_path)
+key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+storage_client = storage.Client.from_service_account_json(key_path)
 
 # Use credentials from st.secrets
-credentials_info = st.secrets["gcp_service_account"]
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
-storage_client = storage.Client(credentials=credentials)
+# credentials_info = st.secrets["gcp_service_account"]
+# credentials = service_account.Credentials.from_service_account_info(credentials_info)
+# storage_client = storage.Client(credentials=credentials)
 
 # Function to generate HTML for TradingView widget
 def tradingview_widget(ticker):
@@ -122,7 +122,11 @@ def load_data_from_gcs(bucket_name, folder_prefix):
 #    Concatenate all the DataFrames in the list into one
     combined_df = pd.concat(df_list, ignore_index=True)
     combined_df['datetime'] = pd.to_datetime(combined_df['datetime'])
+    lookback_date = pd.Timestamp.today() - pd.Timedelta(days=days)
+    combined_df['Enter_class_recent'] = (combined_df['Enter_class'] == 1) & (combined_df['datetime'] > lookback_date)
+    
     return combined_df
+    
 
 # Initialize session state for login status
 if 'logged_in' not in st.session_state:
@@ -142,6 +146,9 @@ with st.sidebar:
             st.session_state.logged_in = False
             st.rerun()
     
+        # Sidebar widget to get the number of days for the filter
+        days = st.sidebar.number_input('Enter the number of days to look back for Enter_class signals:', min_value=1, value=10)
+
     else:
         st.title("Login")
         username = st.text_input("Username")
@@ -166,6 +173,14 @@ if ss.logged_in:
     show_enter = st.checkbox('Show Enter Predicted', True)
     show_exit = st.checkbox('Show Exit Predicted', True)
     show_attention = st.checkbox('Show Attention Predicted', True)
+
+    st.header('Recent Enter Signals')
+    recent_signals = df[df['Enter_class_recent']]
+    if not recent_signals.empty:
+        st.dataframe(recent_signals[['stocks', 'datetime']])
+    else:
+        st.write(f"No recent Enter_class signals found in the last {days} days.")
+
 
     st.sidebar.header('Stock List')
     ticker = st.sidebar.radio('Choose a ticker:', df['stocks'].unique())
