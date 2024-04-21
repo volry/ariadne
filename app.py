@@ -12,7 +12,7 @@ import google.auth
 import streamlit.components.v1 as components
 
 # Set page configuration
-st.set_page_config(layout="wide", page_title="Ariadne v.0.1.4", page_icon=":chart_with_upwards_trend:")
+st.set_page_config(layout="wide", page_title="Ariadne v.0.1.5", page_icon=":chart_with_upwards_trend:")
 
 # local key
 key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
