@@ -15,13 +15,13 @@ import streamlit.components.v1 as components
 st.set_page_config(layout="wide", page_title="Ariadne v.0.1.4", page_icon=":chart_with_upwards_trend:")
 
 # local key
-# key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
-# storage_client = storage.Client.from_service_account_json(key_path)
+key_path = "/home/vova/Downloads/bionic-run-419111-4b5d62a9fac3.json"
+storage_client = storage.Client.from_service_account_json(key_path)
 
 # Use credentials from st.secrets
-credentials_info = st.secrets["gcp_service_account"]
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
-storage_client = storage.Client(credentials=credentials)
+# credentials_info = st.secrets["gcp_service_account"]
+# credentials = service_account.Credentials.from_service_account_info(credentials_info)
+# storage_client = storage.Client(credentials=credentials)
 
 # Function to generate HTML for TradingView widget
 def tradingview_widget(ticker):
@@ -144,9 +144,11 @@ if 'logged_in' not in st.session_state:
 
 # Check if 'data' is already loaded into session state
 if 'data' not in st.session_state or 'filtered_df' not in st.session_state:
-    # If not, load the data and cache it in the session state
+    ## If not, load the data and cache it in the session state
     st.session_state['data'] = load_data_from_gcs(bucket_name, folder_prefix)
     st.session_state['filtered_df'] = filter_recent_signals(st.session_state['data'], 10)  # Initializing with a default lookback period of 10 days
+
+# Sidebar for login/logout and data refresh
 
 # Sidebar for login/logout and data refresh
 with st.sidebar:
@@ -198,13 +200,15 @@ if ss.logged_in:
     st.header('Recent Enter Signals')
     if 'filtered_df' in st.session_state and not st.session_state['filtered_df'].empty:
         st.dataframe(st.session_state['filtered_df'][['stocks', 'datetime']])
+        # Use only stocks from filtered_df for the stock list
+        ticker = st.sidebar.radio('Choose a ticker:', options=st.session_state['filtered_df']['stocks'].unique())
     else:
         st.write(f"No recent Enter_class signals found in the last {days} days.")
-    
+        ticker = st.sidebar.radio('Choose a ticker:', options=df['stocks'].unique())  # Fallback to full list if no recent signals
 
 
-    st.sidebar.header('Stock List')
-    ticker = st.sidebar.radio('Choose a ticker:', df['stocks'].unique())
+    # st.sidebar.header('Stock List')
+    # ticker = st.sidebar.radio('Choose a ticker:', df['stocks'].unique())
 
     st.title('Stock Data Visualization')
     components.html(tradingview_widget(ticker), height=610)
