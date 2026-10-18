@@ -5,6 +5,7 @@
 ## Правила
 - Спілкуйся українською. Терміни (harness, Definition of Done тощо) лишай англійською з поясненням.
 - Оригінальний курс: `../learn-harness-engineering` (лекції в `docs/uk/lectures/`, еталони в `projects/*/solution/`).
+  Якщо його немає: `git clone --depth 1 https://github.com/walkinglabs/learn-harness-engineering ../learn-harness-engineering`.
   Не показуй `solution/`, доки я сам не спробував і не попросив.
 - На початку сесії читай `PROGRESS.md`; наприкінці — онови його (фаза, що далі, рядок у журналі).
 - Конспект кожної лекції — `notes/LNN-<коротка-назва>.md`: 5–10 ключових тез + мої відповіді на вправи.
